@@ -3,12 +3,14 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:snake_game/widgets/blank_pixel.dart';
 import 'package:snake_game/widgets/head_pixel.dart';
 import 'package:snake_game/widgets/obstacle_pixel.dart';
 import 'package:snake_game/widgets/snake_pixel.dart';
 
+import '../controller/level_controller.dart';
 import 'food_pixel.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -34,7 +36,7 @@ enum snakeDirection { UP, DOWN, LEFT, RIGHT }
 
 class _MyHomePageState extends State<MyHomePage> {
   bool gameHasStarted = false;
- 
+ final LevelController _levelController=Get.find<LevelController>();
 
 //grid dimensions
 
@@ -272,6 +274,8 @@ class _MyHomePageState extends State<MyHomePage> {
     if(currentScore> scoreMax){
       pref.setInt("${widget.level}", currentScore);
     scoreMax = pref.getInt('${widget.level}') ?? 0;
+  _levelController.setNbStart(widget.totalNumberOfSquares,widget.level,scoreMax);
+
     }
   }
 

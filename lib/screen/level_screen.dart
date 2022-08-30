@@ -6,7 +6,7 @@ import 'package:snake_game/widgets/Stars.dart';
 
 import 'package:snake_game/widgets/home_page.dart';
 
-import '../controller/score_controller.dart';
+import '../controller/level_controller.dart';
 
 class LevelScreen extends StatefulWidget {
   const LevelScreen({Key? key}) : super(key: key);
@@ -16,56 +16,54 @@ class LevelScreen extends StatefulWidget {
 }
 
 class _LevelScreenState extends State<LevelScreen> {
-  List<Level> levels=[];
-  int nbLevel=12;
+ LevelController _levelController=Get.put(LevelController());
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getScoreMax();
+   _levelController.getListLevel();
   }
-   getScoreMax() async {
-    final pref=await SharedPreferences.getInstance();
-     List<Level> levelList=[];
-      for(int i=0;i<nbLevel;i++){
-       int scoreMax = pref.getInt('${i+1}') ?? 0;
-        levelList.add(Level(level: i+1,maxScore: scoreMax));
-      //  print("${levelList[i].level} :${levelList[i].maxScore}");
-      }
-      setState(() {
-        levels =levelList;
-      });
-
-    
-  }
+   
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          body: Column(
+          body: Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: Column(
         children: [
-          const Expanded(child: Center(
-            child: Text("Level",style:TextStyle(color: Colors.white,fontSize: 25)),
-          )),
-          Expanded(
-            flex: 4,
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: GridView.builder(
-                    itemCount: levels.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3),
-                    itemBuilder: (context, index)  {
-                      return LevelItem(level: levels[index],);
-                    }),
+            /*const Expanded(child: Center(
+              child: Text("Level",style:TextStyle(color: Colors.white,fontSize: 25)),
+            )),*/
+            Expanded(
+              flex: 4,
+              child: GetBuilder<LevelController>(
+                builder: (_) {
+                  return Center(
+                    child:
+                         Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                         child: 
+                              _levelController.levels.isNotEmpty? GridView.builder(
+                                  itemCount: _levelController.levels.length,
+                                //  physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3),
+                                  itemBuilder: (context, index)  {
+
+                                    return LevelItem(level: _levelController.levels[index],);
+                                  }):const CircularProgressIndicator()
+                           
+                        )
+                     
+                  );
+                }
               ),
             ),
-          ),
-          Expanded(child: Container()),
+            Expanded(child: Container()),
         ],
-      )),
+      ),
+          )),
     );
   }
 }
@@ -78,45 +76,26 @@ class LevelItem extends StatefulWidget {
   State<LevelItem> createState() => _LevelItemState();
 }
 
-class _LevelItemState extends State<LevelItem> with WidgetsBindingObserver{
- //ScoreController scoreController=Get.put(ScoreController());
+class _LevelItemState extends State<LevelItem> {
+
 
 int rowSize= 0;
   int totalNumberOfSquares=0;
-int nbStars=0;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     rowSize= widget.level.level!+9;
     totalNumberOfSquares=(widget.level.level!+9)*(widget.level.level!+9);
-  calculNbStars();
+ //
   }
- void calculNbStars(){
 
-  double facteur =(totalNumberOfSquares-(3+widget.level.level!-1))/35;
-  print(facteur);
 
- if(   widget.level.maxScore! >facteur &&widget.level.maxScore! <=2*facteur ){
-  nbStars=1;
- }else if(   widget.level.maxScore! >2*facteur &&widget.level.maxScore! <=3*facteur ){
-  nbStars=2;
- }else if(   widget.level.maxScore! >3*facteur ){
-  nbStars=3;
- }
- }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // TODO: implement didChangeAppLifecycleState
-    super.didChangeAppLifecycleState(state);
-    if(state==AppLifecycleState.resumed){
-      print("Resumed");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 4),
       child: GestureDetector(
@@ -128,8 +107,10 @@ int nbStars=0;
                     builder: (context) => MyHomePage(
                           rowSize: rowSize,
                           totalNumberOfSquares: totalNumberOfSquares,
-                          milliseconds: 210-(widget.level.level!+9),
-                          nbObstacle: widget.level.level!-1,
+                          milliseconds:widget.level.level! < 10 ? 250-(widget.level.level!*10):100,
+                          nbObstacle: widget.level.level! < 10 ?
+                          widget.level.level!-1 :
+                          widget.level.level!-10,
                           level: widget.level.level!,
                            outline: widget.level.level!>9,
                         )),
@@ -151,7 +132,7 @@ int nbStars=0;
               style: const TextStyle(color: Colors.white,fontSize: 40),
               ),
              
-               Stars(nbStars: nbStars,),
+               Stars(nbStars:widget.level.nbStars!,),
             ],
           ),
         ),
