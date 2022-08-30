@@ -306,13 +306,51 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Expanded(
                   child: Center(
-                      child: Text(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                   const  Icon(Icons.shield_sharp),
+                                   const SizedBox(width: 5,),
+                                    Text(
+                    scoreMax.toString(),
+                    style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                  ),
+                                  ],
+                                ),
+                  Row(
+                    children:const [
+                      Text(
+                        "12",
+                        style:  TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                      ),
+                      SizedBox(width: 5,),
+                    Icon(Icons.add_circle_outline)
+                    ],
+                  ),
+                              ],
+                            ),
+                          ),
+                          Text(
                     currentScore.toString(),
                     style: const TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ))),
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                  ),
+                        ],
+                      ))),
               Expanded(
                   flex: 3,
                   child: GestureDetector(

@@ -16,54 +16,83 @@ class LevelScreen extends StatefulWidget {
 }
 
 class _LevelScreenState extends State<LevelScreen> {
- LevelController _levelController=Get.put(LevelController());
+  LevelController _levelController = Get.put(LevelController());
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-   _levelController.getListLevel();
-  }
+    init();
    
+  }
+  init() async {
+   await _levelController.getListLevel();
+    _levelController.getTotalStars();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
           body: Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: Column(
-        children: [
-            /*const Expanded(child: Center(
-              child: Text("Level",style:TextStyle(color: Colors.white,fontSize: 25)),
-            )),*/
+        padding: const EdgeInsets.only(top: 20),
+        child: Column(
+          children: [
+            Container(
+                height: 30,
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                margin: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  children:  [
+                    const Expanded(
+                      child:  Center(
+                        child: Text("Levels",
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 25)),
+                      ),
+                    ),
+                  Row(
+                    children:  [
+                        GetBuilder<LevelController>(
+                          builder: (_) {
+                            return Text(
+                              _levelController.totalStars.toString(),style: TextStyle(color:Colors.white,fontSize: 20,fontWeight: FontWeight.w600),
+                            );
+                          }
+                        ),
+                       const SizedBox(width: 5,),
+                       const Icon(Icons.star,
+                        size: 30,
+                        color: Color.fromRGBO(255, 179, 0, 1),)
+                    ],
+                  )
+                  ],
+                )),
             Expanded(
-              flex: 4,
-              child: GetBuilder<LevelController>(
-                builder: (_) {
-                  return Center(
-                    child:
-                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                         child: 
-                              _levelController.levels.isNotEmpty? GridView.builder(
-                                  itemCount: _levelController.levels.length,
+              flex: 5,
+              child: GetBuilder<LevelController>(builder: (_) {
+                return Center(
+                    child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: _levelController.levels.isNotEmpty
+                            ? GridView.builder(
+                                itemCount: _levelController.levels.length,
                                 //  physics: const NeverScrollableScrollPhysics(),
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 3),
-                                  itemBuilder: (context, index)  {
-
-                                    return LevelItem(level: _levelController.levels[index],);
-                                  }):const CircularProgressIndicator()
-                           
-                        )
-                     
-                  );
-                }
-              ),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 3),
+                                itemBuilder: (context, index) {
+                                  return LevelItem(
+                                    level: _levelController.levels[index],
+                                  );
+                                })
+                            : const CircularProgressIndicator()));
+              }),
             ),
             Expanded(child: Container()),
-        ],
-      ),
-          )),
+          ],
+        ),
+      )),
     );
   }
 }
@@ -77,45 +106,84 @@ class LevelItem extends StatefulWidget {
 }
 
 class _LevelItemState extends State<LevelItem> {
-
-
-int rowSize= 0;
-  int totalNumberOfSquares=0;
+  final LevelController _levelController=Get.find<LevelController>();
+  int rowSize = 0;
+  int totalNumberOfSquares = 0;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    rowSize= widget.level.level!+9;
-    totalNumberOfSquares=(widget.level.level!+9)*(widget.level.level!+9);
- //
+    rowSize = widget.level.level! + 9;
+    totalNumberOfSquares =
+        (widget.level.level! + 9) * (widget.level.level! + 9);
+    //
   }
 
-
+  showCustomDialog(){
+    showDialog(context: context, builder: (context){
+           int requiredStar= (widget.level.level!-1)*2 ;
+            return  AlertDialog(
+              actions: [
+                 Container(
+                      width: double.infinity,
+                      color: Colors.black,
+                      margin: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                       child: FlatButton(
+                
+                  child: const Text('Ok',style: TextStyle(color: Colors.white,fontSize: 20),),
+                  onPressed: () {
+                   
+                    Navigator.of(context).pop();
+                  }),
+                     )
+              ],
+              actionsAlignment: MainAxisAlignment.center,
+              backgroundColor: Colors.white70,
+              titleTextStyle: TextStyle(),
+              //title: const Text("level closed",style: TextStyle(color: Colors.black,fontSize: 25),),
+              content: Container(
+               height: 100,
+                padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                child:Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.lock,color: Colors.black,size: 40,),
+                   const SizedBox(height: 10,),
+                    Text("You should get $requiredStar stars",
+                    style: const TextStyle(color: Colors.black,fontSize: 20),),
+                  ],
+                ) ),
+            );
+          });
+  }
 
   @override
   Widget build(BuildContext context) {
-    
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       child: GestureDetector(
         onTap: () {
-
+          if(_levelController.totalStars >=(widget.level.level!-1)*2 ){
           Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => MyHomePage(
-                          rowSize: rowSize,
-                          totalNumberOfSquares: totalNumberOfSquares,
-                          milliseconds:widget.level.level! < 10 ? 250-(widget.level.level!*10):100,
-                          nbObstacle: widget.level.level! < 10 ?
-                          widget.level.level!-1 :
-                          widget.level.level!-10,
-                          level: widget.level.level!,
-                           outline: widget.level.level!>9,
-                        )),
-              );
-        
+            context,
+            MaterialPageRoute(
+                builder: (context) => MyHomePage(
+                      rowSize: rowSize,
+                      totalNumberOfSquares: totalNumberOfSquares,
+                      milliseconds: widget.level.level! < 10
+                          ? 250 - (widget.level.level! * 10)
+                          : 100,
+                      nbObstacle: widget.level.level! < 10
+                          ? widget.level.level! - 1
+                          : widget.level.level! - 10,
+                      level: widget.level.level!,
+                      outline: widget.level.level! > 9,
+                    )),
+          );
+          }else{
+          showCustomDialog();
+          }
         },
         child: Container(
           alignment: Alignment.center,
@@ -128,11 +196,13 @@ int rowSize= 0;
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("${widget.level.level}",
-              style: const TextStyle(color: Colors.white,fontSize: 40),
+              Text(
+                "${widget.level.level}",
+                style: const TextStyle(color: Colors.white, fontSize: 40),
               ),
-             
-               Stars(nbStars:widget.level.nbStars!,),
+              Stars(
+                nbStars: widget.level.nbStars!,
+              ),
             ],
           ),
         ),
@@ -140,5 +210,3 @@ int rowSize= 0;
     );
   }
 }
-
-
