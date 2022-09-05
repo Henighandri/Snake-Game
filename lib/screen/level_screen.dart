@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:snake_game/ads/interstitiel_ad_model.dart';
 import 'package:snake_game/models/level.dart';
 import 'package:snake_game/widgets/Stars.dart';
 
 import 'package:snake_game/widgets/home_page.dart';
 
+import '../ads/banner_ad_model.dart';
 import '../controller/level_controller.dart';
 
 class LevelScreen extends StatefulWidget {
@@ -21,6 +23,7 @@ class _LevelScreenState extends State<LevelScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    AdIntertitiel.loadAd();
     init();
    
   }
@@ -89,7 +92,8 @@ class _LevelScreenState extends State<LevelScreen> {
                             : const CircularProgressIndicator()));
               }),
             ),
-            Expanded(child: Container()),
+            const SizedBox(height: 35,),
+           const AdBanner(),
           ],
         ),
       )),
@@ -165,6 +169,13 @@ class _LevelItemState extends State<LevelItem> {
       child: GestureDetector(
         onTap: () {
           if(_levelController.totalStars >=(widget.level.level!-1)*2 ){
+            if( AdIntertitiel.nbShow==2){
+                AdIntertitiel.showAd();
+                AdIntertitiel.nbShow=0;
+            }else{
+              AdIntertitiel.nbShow++;
+            }
+           
           Navigator.push(
             context,
             MaterialPageRoute(
