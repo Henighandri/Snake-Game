@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:snake_game/ads/interstitiel_ad_model.dart';
+import 'package:snake_game/controller/settings_controller.dart';
 import 'package:snake_game/screen/level_screen.dart';
 import 'package:snake_game/widgets/blank_pixel.dart';
 import 'package:snake_game/widgets/head_pixel.dart';
@@ -15,7 +17,8 @@ import 'package:snake_game/widgets/snake_pixel.dart';
 import '../ads/banner_ad_model.dart';
 import '../ads/rewarded_ad_model.dart';
 import '../controller/level_controller.dart';
-import 'food_pixel.dart';
+import '../widgets/bottons_joypad.dart';
+import '../widgets/food_pixel.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage(
@@ -42,6 +45,8 @@ enum snakeDirection { UP, DOWN, LEFT, RIGHT }
 class _MyHomePageState extends State<MyHomePage> {
   bool gameHasStarted = false;
   final LevelController _levelController = Get.find<LevelController>();
+  final SettingsController _settingsController = Get.put(SettingsController());
+
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 //grid dimensions
 
@@ -60,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int scoreMax = 0;
 
   bool stopTimer = false;
+  final player = AudioCache();
 
   @override
   void initState() {
@@ -74,13 +80,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
     outlineConstruction();
     randomObstacle();
+    _settingsController.getSettings();
   }
+
+  Future<void> initPlayerSound() async {}
 
 //start the game
   void startGame() {
     AdRewarded.loadAd();
     AdIntertitiel.loadAd();
-    stopTimer=false;
+    stopTimer = false;
     gameHasStarted = true;
     Timer.periodic(Duration(milliseconds: widget.milliseconds), (timer) {
       setState(() {
@@ -89,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
         if (stopTimer) {
           timer.cancel();
         }
-       
+
         //check if the game is over
         if (gameOver()) {
           timer.cancel();
@@ -215,49 +224,49 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Get.to(()=>const LevelScreen());
+                        Get.to(() => const LevelScreen());
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                           color: Colors.red,
+                          color: Colors.red,
                         ),
-                       
                         child: const Icon(Icons.home),
                       ),
                     ),
-                     GestureDetector(
+                    GestureDetector(
                       onTap: () {
-                       restartGame();
+                        restartGame();
                         //gameHasStarted=false;
                         Navigator.pop(context);
-                        
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                           color: Colors.red,
+                          color: Colors.red,
                         ),
                         child: const Icon(Icons.replay),
                       ),
                     ),
-                     GestureDetector(
+                    GestureDetector(
                       onTap: () {
-                         Navigator.pop(context);
-                         startGame();
+                        Navigator.pop(context);
+                        startGame();
                       },
                       child: Container(
-                       padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                           color: Colors.red,
+                          color: Colors.red,
                         ),
                         child: const Icon(Icons.play_arrow),
                       ),
                     ),
-                    
                   ],
                 )),
           );
@@ -265,7 +274,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void restartGame() {
-
     setState(() {
       gameHasStarted = false;
       changeFoodPos();
@@ -337,10 +345,24 @@ class _MyHomePageState extends State<MyHomePage> {
     //snake is eating food
     if (snakePos.last == foodPos) {
       currentScore++;
+
+      playSound("sound.wav");
       changeFoodPos();
     } else {
       //remove the tail
       snakePos.removeAt(0);
+    }
+  }
+
+  void playSound(String soundAsset) {
+    if (_settingsController.sound!) {
+      player.play(soundAsset);
+    }
+  }
+
+  void vibration() {
+    if (_settingsController.vibration!) {
+      HapticFeedback.heavyImpact();
     }
   }
 
@@ -385,6 +407,7 @@ class _MyHomePageState extends State<MyHomePage> {
     List<int> bodySnake = snakePos.sublist(0, snakePos.length - 1);
     if (bodySnake.contains(snakePos.last) ||
         obstaclePixel.contains(snakePos.last)) {
+      playSound("game_over.wav");
       return true;
     }
     return false;
@@ -430,6 +453,7 @@ class _MyHomePageState extends State<MyHomePage> {
             focusNode: FocusNode(),
             autofocus: true,
             onKey: (event) {
+              vibration();
               if (event.character.toString() == 'z' &&
                   currentDirection != snakeDirection.DOWN) {
                 currentDirection = snakeDirection.UP;
@@ -468,9 +492,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                       ),
                       MaterialButton(
+                        
                         onPressed: () {
-                             stopTimer = true;
-                          showPauseDialog();
+                          stopTimer = true;
+                          if(!gameOver()){
+                              showPauseDialog();
+                          }
+                         
                         },
                         child: const Icon(Icons.pause),
                       ),
@@ -494,30 +522,34 @@ class _MyHomePageState extends State<MyHomePage> {
                       )),
                       child: GestureDetector(
                         onVerticalDragUpdate: (details) {
-                           if (!gameHasStarted) {
-                            startGame();
+                          if (_settingsController.controls == 'Swipe') {
+                            if (!gameHasStarted) {
+                              startGame();
+                            }
+                            vibration();
+                            if (details.delta.dy > 0 &&
+                                currentDirection != snakeDirection.UP) {
+                              currentDirection = snakeDirection.DOWN;
+                            } else if (details.delta.dy < 0 &&
+                                currentDirection != snakeDirection.DOWN) {
+                              currentDirection = snakeDirection.UP;
+                            }
                           }
-                          if (details.delta.dy > 0 &&
-                              currentDirection != snakeDirection.UP) {
-                            currentDirection = snakeDirection.DOWN;
-                          } else if (details.delta.dy < 0 &&
-                              currentDirection != snakeDirection.DOWN) {
-                            currentDirection = snakeDirection.UP;
-                          }
-                         
                         },
                         onHorizontalDragUpdate: (details) {
-                           if (!gameHasStarted) {
-                            startGame();
+                          if (_settingsController.controls == 'Swipe') {
+                            if (!gameHasStarted) {
+                              startGame();
+                            }
+                            vibration();
+                            if (details.delta.dx > 0 &&
+                                currentDirection != snakeDirection.LEFT) {
+                              currentDirection = snakeDirection.RIGHT;
+                            } else if (details.delta.dx < 0 &&
+                                currentDirection != snakeDirection.RIGHT) {
+                              currentDirection = snakeDirection.LEFT;
+                            }
                           }
-                          if (details.delta.dx > 0 &&
-                              currentDirection != snakeDirection.LEFT) {
-                            currentDirection = snakeDirection.RIGHT;
-                          } else if (details.delta.dx < 0 &&
-                              currentDirection != snakeDirection.RIGHT) {
-                            currentDirection = snakeDirection.LEFT;
-                          }
-                         
                         },
                         child: Column(
                           children: [
@@ -542,13 +574,58 @@ class _MyHomePageState extends State<MyHomePage> {
                                     }
                                   }),
                             ),
-
-                            Image.asset(
-                              "assets/icons/drag.png",
-                              height: 100,
-                              width: 100,
-                            )
-
+                            _settingsController.controls == 'Swipe'
+                                ? Image.asset(
+                                    "assets/icons/drag.png",
+                                    height: 100,
+                                    width: 100,
+                                  )
+                                : ButtonsJoyPad(
+                                    onTapDown: () {
+                                      vibration();
+                                      if (!gameHasStarted) {
+                                        startGame();
+                                      }
+                                      if (currentDirection !=
+                                          snakeDirection.UP) {
+                                        currentDirection = snakeDirection.DOWN;
+                                      }
+                                        
+                                    },
+                                    onTapUp: () {
+                                      if (!gameHasStarted) {
+                                        startGame();
+                                      }
+                                      vibration();
+                                      if (currentDirection !=
+                                          snakeDirection.DOWN) {
+                                        currentDirection = snakeDirection.UP;
+                                      }
+                                        
+                                    },
+                                    onTapRight: () {
+                                      if (!gameHasStarted) {
+                                        startGame();
+                                      }
+                                      vibration();
+                                      if (currentDirection !=
+                                          snakeDirection.LEFT) {
+                                        currentDirection = snakeDirection.RIGHT;
+                                      }
+                                     
+                                    },
+                                    onTapLeft: () {
+                                      if (!gameHasStarted) {
+                                        startGame();
+                                      }
+                                      vibration();
+                                      if (currentDirection !=
+                                          snakeDirection.RIGHT) {
+                                        currentDirection = snakeDirection.LEFT;
+                                      }
+                                        
+                                    },
+                                  ),
                             // Icon(Icons.drag)
                           ],
                         ),

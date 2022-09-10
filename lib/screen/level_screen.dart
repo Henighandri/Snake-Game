@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:snake_game/ads/interstitiel_ad_model.dart';
 import 'package:snake_game/models/level.dart';
+import 'package:snake_game/screen/setting_screen.dart';
 import 'package:snake_game/widgets/Stars.dart';
 
-import 'package:snake_game/widgets/home_page.dart';
+import 'package:snake_game/screen/home_page.dart';
 
 import '../ads/banner_ad_model.dart';
 import '../controller/level_controller.dart';
@@ -18,17 +18,17 @@ class LevelScreen extends StatefulWidget {
 }
 
 class _LevelScreenState extends State<LevelScreen> {
-  LevelController _levelController = Get.put(LevelController());
+  final LevelController _levelController = Get.put(LevelController());
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     AdIntertitiel.loadAd();
     init();
-   
   }
+
   init() async {
-   await _levelController.getListLevel();
+    await _levelController.getListLevel();
     _levelController.getTotalStars();
   }
 
@@ -46,29 +46,41 @@ class _LevelScreenState extends State<LevelScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 margin: const EdgeInsets.only(bottom: 10),
                 child: Row(
-                  children:  [
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.settings),
+                      onPressed: () {
+                        Get.to(() => SettingScreen());
+                      },
+                    ),
                     const Expanded(
-                      child:  Center(
+                      child: Center(
                         child: Text("Levels",
                             style:
                                 TextStyle(color: Colors.white, fontSize: 25)),
                       ),
                     ),
-                  Row(
-                    children:  [
-                        GetBuilder<LevelController>(
-                          builder: (_) {
-                            return Text(
-                              _levelController.totalStars.toString(),style: TextStyle(color:Colors.white,fontSize: 20,fontWeight: FontWeight.w600),
-                            );
-                          }
+                    Row(
+                      children: [
+                        GetBuilder<LevelController>(builder: (_) {
+                          return Text(
+                            _levelController.totalStars.toString(),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600),
+                          );
+                        }),
+                        const SizedBox(
+                          width: 5,
                         ),
-                       const SizedBox(width: 5,),
-                       const Icon(Icons.star,
-                        size: 30,
-                        color: Color.fromRGBO(255, 179, 0, 1),)
-                    ],
-                  )
+                        const Icon(
+                          Icons.star,
+                          size: 30,
+                          color: Color.fromRGBO(255, 179, 0, 1),
+                        )
+                      ],
+                    )
                   ],
                 )),
             Expanded(
@@ -92,8 +104,10 @@ class _LevelScreenState extends State<LevelScreen> {
                             : const CircularProgressIndicator()));
               }),
             ),
-            const SizedBox(height: 35,),
-           const AdBanner(),
+            const SizedBox(
+              height: 35,
+            ),
+            const AdBanner(),
           ],
         ),
       )),
@@ -110,7 +124,7 @@ class LevelItem extends StatefulWidget {
 }
 
 class _LevelItemState extends State<LevelItem> {
-  final LevelController _levelController=Get.find<LevelController>();
+  final LevelController _levelController = Get.find<LevelController>();
   int rowSize = 0;
   int totalNumberOfSquares = 0;
 
@@ -124,42 +138,54 @@ class _LevelItemState extends State<LevelItem> {
     //
   }
 
-  showCustomDialog(){
-    showDialog(context: context, builder: (context){
-           int requiredStar= (widget.level.level!-1)*2 ;
-            return  AlertDialog(
-              actions: [
-                 Container(
-                      width: double.infinity,
-                      color: Colors.black,
-                      margin: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
-                       child: FlatButton(
-                
-                  child: const Text('Ok',style: TextStyle(color: Colors.white,fontSize: 20),),
-                  onPressed: () {
-                   
-                    Navigator.of(context).pop();
-                  }),
-                     )
-              ],
-              actionsAlignment: MainAxisAlignment.center,
-              backgroundColor: Colors.white70,
-              titleTextStyle: TextStyle(),
-              //title: const Text("level closed",style: TextStyle(color: Colors.black,fontSize: 25),),
-              content: Container(
-               height: 100,
-                padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
-                child:Column(
+  showCustomDialog() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          int requiredStar = (widget.level.level! - 1) * 2;
+          return AlertDialog(
+            actions: [
+              Container(
+                width: double.infinity,
+                color: Colors.black,
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: FlatButton(
+                    child: const Text(
+                      'Ok',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    }),
+              )
+            ],
+            actionsAlignment: MainAxisAlignment.center,
+            backgroundColor: Colors.white70,
+            titleTextStyle: TextStyle(),
+            //title: const Text("level closed",style: TextStyle(color: Colors.black,fontSize: 25),),
+            content: Container(
+                height: 100,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.lock,color: Colors.black,size: 40,),
-                   const SizedBox(height: 10,),
-                    Text("You should get $requiredStar stars",
-                    style: const TextStyle(color: Colors.black,fontSize: 20),),
+                    const Icon(
+                      Icons.lock,
+                      color: Colors.black,
+                      size: 40,
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "You should get $requiredStar stars",
+                      style: const TextStyle(color: Colors.black, fontSize: 20),
+                    ),
                   ],
-                ) ),
-            );
-          });
+                )),
+          );
+        });
   }
 
   @override
@@ -168,32 +194,32 @@ class _LevelItemState extends State<LevelItem> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       child: GestureDetector(
         onTap: () {
-          if(_levelController.totalStars >=(widget.level.level!-1)*2 ){
-            if( AdIntertitiel.nbShow==2){
-                AdIntertitiel.showAd();
-                AdIntertitiel.nbShow=0;
-            }else{
+          if (_levelController.totalStars >= (widget.level.level! - 1) * 2) {
+            if (AdIntertitiel.nbShow == 2) {
+              AdIntertitiel.showAd();
+              AdIntertitiel.nbShow = 0;
+            } else {
               AdIntertitiel.nbShow++;
             }
-           
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MyHomePage(
-                      rowSize: rowSize,
-                      totalNumberOfSquares: totalNumberOfSquares,
-                      milliseconds: widget.level.level! < 10
-                          ? 250 - (widget.level.level! * 10)
-                          : 100,
-                      nbObstacle: widget.level.level! < 10
-                          ? widget.level.level! - 1
-                          : widget.level.level! - 10,
-                      level: widget.level.level!,
-                      outline: widget.level.level! > 9,
-                    )),
-          );
-          }else{
-          showCustomDialog();
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MyHomePage(
+                        rowSize: rowSize,
+                        totalNumberOfSquares: totalNumberOfSquares,
+                        milliseconds: widget.level.level! < 10
+                            ? 250 - (widget.level.level! * 10)
+                            : 100,
+                        nbObstacle: widget.level.level! < 10
+                            ? widget.level.level! - 1
+                            : widget.level.level! - 10,
+                        level: widget.level.level!,
+                        outline: widget.level.level! > 9,
+                      )),
+            );
+          } else {
+            showCustomDialog();
           }
         },
         child: Container(
