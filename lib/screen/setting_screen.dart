@@ -13,7 +13,7 @@ class SettingScreen extends StatefulWidget {
 
 class _SettingScreenState extends State<SettingScreen> {
   final double space = 15;
-  final SettingsController _settinsController = Get.put(SettingsController());
+  final SettingsController _settinsController = Get.find<SettingsController>();
 
   
   @override
@@ -30,7 +30,7 @@ class _SettingScreenState extends State<SettingScreen> {
         children: [
           Text(
             text,
-            style: TextStyle(fontSize: 20, color: Colors.white),
+            style: TextStyle(fontSize: 20,),
           ),
           if (val != null)
             CupertinoSwitch(
@@ -55,7 +55,7 @@ class _SettingScreenState extends State<SettingScreen> {
         children: [
           Text(
             text,
-            style: const TextStyle(fontSize: 20, color: Colors.white),
+            style: const TextStyle(fontSize: 20, ),
           ),
           DropdownButton(
                
@@ -84,14 +84,14 @@ class _SettingScreenState extends State<SettingScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-      backgroundColor: Colors.black,
+     
        appBar: AppBar(
-        backgroundColor: Colors.black,
+       
         centerTitle: true,
-        title:const Text(
+        title: Text(
                 "SETTINGS",
-                style: TextStyle(
-                    fontSize: 25, color: Colors.white, letterSpacing: 5),
+                style: Theme.of(context).textTheme.headline5!.copyWith(letterSpacing: 5)
+                
                     
               ) ,
             leading: IconButton(
@@ -100,7 +100,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   },
                   icon: const Icon(
                     Icons.arrow_back_ios,
-                    color: Colors.white,
+                   
                   )),
        ),
        
@@ -108,13 +108,21 @@ class _SettingScreenState extends State<SettingScreen> {
         return Column(children: [
           
           
-          
+          const SizedBox(height: 5,),
           const Text(
             "Play as you wish",
             style: TextStyle(fontSize: 15, color: Colors.grey),
           ),
           const SizedBox(
             height: 20,
+          ), customSwitch("Dark Mode", _settinsController.darkMode,
+              _settinsController.onChangedTheme),
+          SizedBox(
+            height: space,
+          ),
+          const Divider(
+            color: Colors.grey,
+            thickness: 1,
           ),
           customSwitch("Sound", _settinsController.sound,
               _settinsController.onChangedSound),
@@ -150,6 +158,7 @@ class _SettingScreenState extends State<SettingScreen> {
             color: Colors.grey,
             thickness: 1,
           )
+
         ]);
       }),
     ));

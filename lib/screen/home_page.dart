@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -43,6 +44,10 @@ class MyHomePage extends StatefulWidget {
 enum snakeDirection { UP, DOWN, LEFT, RIGHT }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+//check connectivity internet
+var connectivityResult;
+
   bool gameHasStarted = false;
   final LevelController _levelController = Get.find<LevelController>();
   final SettingsController _settingsController = Get.put(SettingsController());
@@ -62,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
 //food position
   late int foodPos;
   int currentScore = 0;
-  int scoreMax = 0;
+  
 
   bool stopTimer = false;
   final player = AudioCache();
@@ -70,8 +75,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     foodPos = (4 * widget.rowSize) + 5;
-    getScoreMax();
-
+    _levelController.getScoreMax(widget.level);
+    
     if (widget.outline) {
       snakePos = [widget.rowSize + 1, widget.rowSize + 2, widget.rowSize + 3];
     } else {
@@ -81,7 +86,17 @@ class _MyHomePageState extends State<MyHomePage> {
     outlineConstruction();
     randomObstacle();
     _settingsController.getSettings();
+   initialConnection();
+
+
   }
+initialConnection()async{
+   connectivityResult = await (Connectivity().checkConnectivity());
+}
+
+bool verifConnection(){
+  return (connectivityResult == ConnectivityResult.mobile) || (connectivityResult == ConnectivityResult.wifi);
+}
 
   Future<void> initPlayerSound() async {}
 
@@ -102,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
         //check if the game is over
         if (gameOver()) {
           timer.cancel();
-          setMaxScore();
+         _levelController.setMaxScore(currentScore,widget.level,widget.totalNumberOfSquares);
           showGameOverDialog();
         }
       });
@@ -132,15 +147,26 @@ class _MyHomePageState extends State<MyHomePage> {
                           snakePos.length <= 2 ? Colors.grey[400] : Colors.pink,
                       onPressed: () {
                         if (snakePos.length > 2) {
-                          AdRewarded.showAd();
-
-                          gameHasStarted = false;
+                        
+                          
+                              AdRewarded.showAd(false);
+                          
+                        
+                         if(AdRewarded.isAdReady && verifConnection()){
+                              gameHasStarted = false;
 
                           setState(() {
                             snakePos.remove(snakePos.last);
                           });
 
                           Navigator.pop(context);
+                         }else{
+                          Get.snackbar("Warning", "please check your connetion",
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white);
+                         }
+
+                         
                         }
                       },
                       child: snakePos.length <= 2
@@ -214,9 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
           return AlertDialog(
             title: const Center(
                 child: Text("PAUSED ",
-                    style: TextStyle(
-                      color: Colors.grey,
-                    ))),
+                   )),
             content: SizedBox(
                 height: 100,
                 child: Row(
@@ -249,7 +273,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           borderRadius: BorderRadius.circular(10),
                           color: Colors.red,
                         ),
-                        child: const Icon(Icons.replay),
+                        child: const Icon(Icons.replay ),
                       ),
                     ),
                     GestureDetector(
@@ -419,23 +443,6 @@ class _MyHomePageState extends State<MyHomePage> {
     stopTimer = true;
   }
 
-  getScoreMax() async {
-    final pref = await SharedPreferences.getInstance();
-    setState(() {
-      scoreMax = pref.getInt('${widget.level}') ?? 0;
-    });
-  }
-
-  Future<void> setMaxScore() async {
-    final pref = await SharedPreferences.getInstance();
-
-    if (currentScore > scoreMax) {
-      pref.setInt("${widget.level}", currentScore);
-      scoreMax = pref.getInt('${widget.level}') ?? 0;
-      _levelController.setNbStart(
-          widget.totalNumberOfSquares, widget.level, scoreMax);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -448,7 +455,7 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         child: Scaffold(
           key: _scaffoldKey,
-          backgroundColor: Colors.black,
+         
           body: RawKeyboardListener(
             focusNode: FocusNode(),
             autofocus: true,
@@ -482,12 +489,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           const SizedBox(
                             width: 5,
                           ),
-                          Text(
-                            scoreMax.toString(),
-                            style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
+                          GetBuilder<LevelController>(
+                            builder: (_) {
+                              return Text(
+                               _levelController.scoreMax.toString(),
+                                style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                   
+                                    ),
+                              );
+                            }
                           ),
                         ],
                       ),
@@ -507,7 +519,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white),
+                            ),
                       ),
                     ],
                   ),
@@ -562,15 +574,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                           crossAxisCount: widget.rowSize),
                                   itemBuilder: (context, index) {
                                     if (obstaclePixel.contains(index)) {
-                                      return const ObstaclePixel();
+                                      return  ObstaclePixel();
                                     } else if (snakePos.last == index) {
                                       return const HeadPixel();
                                     } else if (snakePos.contains(index)) {
-                                      return const SnakePixel();
+                                      return  SnakePixel();
                                     } else if (index == foodPos) {
                                       return const FoodPixel();
                                     } else {
-                                      return const BlankPixel();
+                                      return  BlankPixel();
                                     }
                                   }),
                             ),

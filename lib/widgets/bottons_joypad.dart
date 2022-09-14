@@ -20,13 +20,13 @@ final Function()? onTapDown;
             onTap: onTapUp,
             child: Container(
               decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white),
+                  border: Border.all(color: Theme.of(context).primaryColor),
                   borderRadius: BorderRadius.circular(20)),
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(10),
               child: const Icon(
                     Icons.keyboard_arrow_up,
-                    color: Colors.white,
+                    
                     size: 36,
                   ),
             ),
@@ -39,13 +39,13 @@ final Function()? onTapDown;
                 onTap:onTapLeft ,
                 child: Container(
                   decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white),
+                      border: Border.all(color:Theme.of(context).primaryColor),
                       borderRadius: BorderRadius.circular(20)),
                   margin: const EdgeInsets.symmetric(horizontal: 5),
                   padding: const EdgeInsets.all(10),
                   child: const Icon(
                         Icons.keyboard_arrow_left,
-                        color: Colors.white,
+                       
                         size: 36,
                       ),
                 ),
@@ -54,14 +54,14 @@ final Function()? onTapDown;
                 onTap: onTapDown,
                  child: Container(
                            decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white),
+                  border: Border.all(color:Theme.of(context).primaryColor),
                   borderRadius: BorderRadius.circular(20)),
                            margin: const EdgeInsets.symmetric(horizontal: 5),
                            padding: const EdgeInsets.all(10),
                            
                            child: const Icon(
                     Icons.keyboard_arrow_down,
-                    color: Colors.white,
+                  
                     size: 36,
                   ),
                          ),
@@ -70,19 +70,20 @@ final Function()? onTapDown;
                 onTap: onTapRight,
                 child: Container(
                   decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white),
+                      border: Border.all(color:Theme.of(context).primaryColor,),
                       borderRadius: BorderRadius.circular(20)),
                   margin: const EdgeInsets.symmetric(horizontal: 5),
                   padding: const EdgeInsets.all(10),
                   child: const Icon(
                         Icons.keyboard_arrow_right,
-                        color: Colors.white,
+                        
                         size: 36,
                       ),
                 ),
               ),
             ],
           ),
+         const  SizedBox(height: 20,)
          
         ]);
   }

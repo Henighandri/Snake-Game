@@ -7,7 +7,8 @@ class LevelController extends GetxController {
   List<Level> levels = [];
   int nbLevel = 20;
   int totalStars = 0;
-
+    int scoreMax=0;
+   int nbStarFromAd=0;
 
   getListLevel() async {
     final pref = await SharedPreferences.getInstance();
@@ -45,14 +46,51 @@ class LevelController extends GetxController {
     update();
   }
 
-  getTotalStars() {
+  getTotalStars() async {
+    await getNbStarFromAd();
     int somStars = 0;
     for (int i = 0; i < levels.length; i++) {
       somStars = somStars + levels[i].nbStars!;
     }
-    totalStars = somStars;
+    totalStars = somStars+nbStarFromAd;
 
     update();
   }
 
+  getNbStarFromAd() async {
+    final pref = await SharedPreferences.getInstance();
+
+    nbStarFromAd = pref.getInt('NbStarFromAd') ?? 0;
+   
+  }
+incrementNbStarFromAd(int nbStar) async {
+ await getNbStarFromAd();
+    final pref = await SharedPreferences.getInstance();
+
+    pref.setInt('NbStarFromAd',nbStar+nbStarFromAd) ;
+    
+  }
+
+
+
+
+  getScoreMax(int level) async {
+    final pref = await SharedPreferences.getInstance();
+
+    scoreMax = pref.getInt(level.toString()) ?? 0;
+    update();
+  }
+
+  Future<void> setMaxScore(
+      int currentScore, int level, int totalNumberOfSquares) async {
+    final pref = await SharedPreferences.getInstance();
+
+    if (currentScore > scoreMax) {
+      pref.setInt("$level", currentScore);
+      scoreMax = pref.getInt('$level') ?? 0;
+      setNbStart(totalNumberOfSquares, level, scoreMax);
+
+      update();
+    }
+  }
 }

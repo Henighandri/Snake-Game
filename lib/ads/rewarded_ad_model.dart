@@ -1,19 +1,22 @@
+import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:snake_game/ads/ad_helper.dart';
+import 'package:snake_game/controller/level_controller.dart';
 
 class AdRewarded {
   static RewardedAd? _rewardedAd;
-  static bool _isAdReady =false;
-  static int amount=0;
+  static bool isAdReady =false;
+ 
 
   static void loadAd() {
+    
     RewardedAd.load(
         adUnitId: AdHelper.rewardAdUnitId,
         request: const AdRequest(),
         rewardedAdLoadCallback: RewardedAdLoadCallback(
           onAdLoaded: (RewardedAd ad) {
             _rewardedAd = ad;
-            _isAdReady=true;
+            isAdReady=true;
           },
           onAdFailedToLoad: (LoadAdError error) {
             print('RewardedAd failed to load: $error');
@@ -21,13 +24,23 @@ class AdRewarded {
         ));
   }
 
-  static void showAd(){
-    if(_isAdReady){
+  static void showAd(bool addStar){
+    LevelController levelController=Get.find<LevelController>();
+    
+    if(isAdReady){
       _rewardedAd!.show(
-        onUserEarnedReward: (ad,reward){
-            amount=reward.amount.toInt();
+        onUserEarnedReward: (ad,reward) async {
+          isAdReady=false;
+           double amount=reward.amount/10;
+           
+            if(addStar){
+           await levelController.incrementNbStarFromAd(amount.toInt());
+            levelController.getTotalStars();
+            }
+            
         });
     }
+ 
   }
 
 

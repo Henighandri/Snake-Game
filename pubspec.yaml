@@ -38,6 +38,7 @@ dependencies:
   get: ^4.6.5
   google_mobile_ads: ^2.0.1
   audioplayers: ^0.20.1
+  connectivity_plus: ^2.3.6+1
   
 dev_dependencies:
   flutter_test:
