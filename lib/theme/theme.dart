@@ -15,11 +15,14 @@ class MyTheme {
     appBarTheme: const AppBarTheme(
         backgroundColor: Colors.white,
         elevation: 0,
+        
         textTheme: TextTheme(
           headline5: TextStyle(fontSize: 25, color: Colors.black),
           bodyText1: TextStyle(fontSize: 20, color: Colors.black),
+         
         ),
         iconTheme: IconThemeData(color: Colors.black)),
+    
     primaryColorLight: Colors.black,
     brightness: Brightness.light,
     primaryColor: Colors.black,

@@ -10,7 +10,7 @@ class FoodPixel extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                        color: Colors.green,
-                       borderRadius: BorderRadius.circular(4)
+                       borderRadius: BorderRadius.circular(2)
 
                     ),
                   ),

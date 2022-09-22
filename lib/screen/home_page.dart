@@ -14,6 +14,7 @@ import 'package:snake_game/widgets/blank_pixel.dart';
 import 'package:snake_game/widgets/head_pixel.dart';
 import 'package:snake_game/widgets/obstacle_pixel.dart';
 import 'package:snake_game/widgets/snake_pixel.dart';
+import 'package:vibration/vibration.dart';
 
 import '../ads/banner_ad_model.dart';
 import '../ads/rewarded_ad_model.dart';
@@ -257,7 +258,7 @@ bool verifConnection(){
                           borderRadius: BorderRadius.circular(10),
                           color: Colors.red,
                         ),
-                        child: const Icon(Icons.home),
+                        child: const Icon(Icons.home,color: Colors.white,),
                       ),
                     ),
                     GestureDetector(
@@ -273,7 +274,7 @@ bool verifConnection(){
                           borderRadius: BorderRadius.circular(10),
                           color: Colors.red,
                         ),
-                        child: const Icon(Icons.replay ),
+                        child: const Icon(Icons.replay,color: Colors.white, ),
                       ),
                     ),
                     GestureDetector(
@@ -288,7 +289,7 @@ bool verifConnection(){
                           borderRadius: BorderRadius.circular(10),
                           color: Colors.red,
                         ),
-                        child: const Icon(Icons.play_arrow),
+                        child: const Icon(Icons.play_arrow,color: Colors.white,),
                       ),
                     ),
                   ],
@@ -386,7 +387,7 @@ bool verifConnection(){
 
   void vibration() {
     if (_settingsController.vibration!) {
-      HapticFeedback.heavyImpact();
+      Vibration.vibrate(duration: 100);
     }
   }
 

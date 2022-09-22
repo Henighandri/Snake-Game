@@ -10,12 +10,12 @@ class BlankPixel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-                  padding: const EdgeInsets.all(2.0),
+                  padding: const EdgeInsets.all(1.0),
                   child: Container(
                     decoration: BoxDecoration(
                  
                 color:settingsController.darkMode! ?Colors.grey[900]: Colors.grey[400],
-                       borderRadius: BorderRadius.circular(4)
+                       borderRadius: BorderRadius.circular(2)
 
                     ),
                   ),

@@ -9,12 +9,12 @@ final SettingsController settingsController=Get.find<SettingsController>();
   @override
   Widget build(BuildContext context) {
     return Padding(
-                  padding: const EdgeInsets.all(2.0),
+                  padding: const EdgeInsets.all(1.0),
                   child: Container(
                     decoration: BoxDecoration(
                      
                      color:settingsController.darkMode!?Colors.grey: Colors.black54,
-                       borderRadius: BorderRadius.circular(4)
+                       borderRadius: BorderRadius.circular(2)
 
                     ),
                   ),

@@ -15,7 +15,7 @@ final SettingsController settingsController=Get.find<SettingsController>();
                     decoration: BoxDecoration(
                      
                       color:settingsController.darkMode!?Colors.white: Colors.black,
-                       borderRadius: BorderRadius.circular(4)
+                       borderRadius: BorderRadius.circular(2)
 
                     ),
                   ),

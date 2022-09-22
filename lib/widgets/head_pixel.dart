@@ -10,7 +10,7 @@ class HeadPixel extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                        color: Colors.red,
-                       borderRadius: BorderRadius.circular(4)
+                       borderRadius: BorderRadius.circular(2)
 
                     ),
                   ),

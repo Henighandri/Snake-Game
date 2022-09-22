@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snake_game/ads/interstitiel_ad_model.dart';
+import 'package:snake_game/controller/settings_controller.dart';
 import 'package:snake_game/models/level.dart';
 import 'package:snake_game/screen/setting_screen.dart';
 import 'package:snake_game/widgets/Stars.dart';
@@ -173,6 +174,7 @@ class LevelItem extends StatefulWidget {
 
 class _LevelItemState extends State<LevelItem> {
   final LevelController _levelController = Get.find<LevelController>();
+  final SettingsController _settingsController = Get.find<SettingsController>();
   int rowSize = 0;
   int totalNumberOfSquares = 0;
 
@@ -195,12 +197,12 @@ class _LevelItemState extends State<LevelItem> {
             actions: [
               Container(
                 width: double.infinity,
-                color: Colors.black,
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                color:Theme.of(context).primaryColor ,
+                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: FlatButton(
-                    child: const Text(
+                    child:  Text(
                       'Ok',
-                      style: TextStyle( fontSize: 20),
+                      style: TextStyle(fontSize: 20,color:_settingsController.darkMode! ?Colors.black:Colors.white ),
                     ),
                     onPressed: () {
                       Navigator.of(context).pop();
@@ -208,9 +210,9 @@ class _LevelItemState extends State<LevelItem> {
               )
             ],
             actionsAlignment: MainAxisAlignment.center,
-            backgroundColor: Colors.white70,
-            titleTextStyle: TextStyle(),
-            //title: const Text("level closed",style: TextStyle(color: Colors.black,fontSize: 25),),
+         
+            
+            
             content: Container(
                 height: 100,
                 padding:
@@ -218,9 +220,9 @@ class _LevelItemState extends State<LevelItem> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                     Icon(
                       Icons.lock,
-                      color: Colors.black,
+                      color:Theme.of(context).primaryColor ,
                       size: 40,
                     ),
                     const SizedBox(
@@ -228,7 +230,7 @@ class _LevelItemState extends State<LevelItem> {
                     ),
                     Text(
                       "You should get $requiredStar stars",
-                      style: const TextStyle(color: Colors.black, fontSize: 20),
+                      style:  TextStyle(color:Theme.of(context).primaryColor , fontSize: 20),
                     ),
                   ],
                 )),
@@ -250,22 +252,18 @@ class _LevelItemState extends State<LevelItem> {
               AdIntertitiel.nbShow++;
             }
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => MyHomePage(
+           Get.to(()=> MyHomePage(
                         rowSize: rowSize,
                         totalNumberOfSquares: totalNumberOfSquares,
                         milliseconds: widget.level.level! < 10
                             ? 250 - (widget.level.level! * 10)
-                            : 100,
+                            : 150,
                         nbObstacle: widget.level.level! < 10
                             ? widget.level.level! - 1
                             : widget.level.level! - 10,
                         level: widget.level.level!,
                         outline: widget.level.level! > 9,
-                      )),
-            );
+                      ));
           } else {
             showCustomDialog();
           }

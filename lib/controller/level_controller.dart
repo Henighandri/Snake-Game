@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,8 +29,19 @@ class LevelController extends GetxController {
   }
 
   int calculNbStars(int totalNumberOfSquares, int level, int maxScore) {
-    double facteur = (totalNumberOfSquares - (3 + level - 1)) / 8;
-    // print(facteur);
+    int facteur=5;
+
+    if(level > 3) {
+      facteur=10;
+    }
+    if(level>10){
+      facteur=15;
+    }
+    if(level>15){
+      facteur=20;
+    }
+   // double facteur = (totalNumberOfSquares - (3 + level - 1)) / a;
+   //  print("$level ==$facteur");
 
     if (maxScore > facteur && maxScore <= 2 * facteur) {
       return 1;
