@@ -2,9 +2,10 @@
 
 import 'dart:async';
 
+import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:page_transition/page_transition.dart';
 import '../controller/settings_controller.dart';
 import 'level_screen.dart';
 
@@ -20,15 +21,16 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
      final SettingsController settingsController=Get.put(SettingsController());
-    Timer(const Duration(seconds: 3),
-          ()=>Get.to(()=>const LevelScreen())
-         );
   }
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child:FlutterLogo(size:MediaQuery.of(context).size.height)
-    );
+    return AnimatedSplashScreen(
+            duration: 2000,
+            splash: Image.asset("assets/icons/app_icon.png"),
+            splashIconSize: MediaQuery.of(context).size.shortestSide*.5 ,
+            nextScreen: const LevelScreen(),
+            splashTransition: SplashTransition.scaleTransition,
+            backgroundColor: Colors.black);
+   
   }
 }
